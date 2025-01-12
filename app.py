@@ -17,27 +17,32 @@ import contractions
 import base64
 from PIL import Image
 import io
-import gdown
 import logging
+from huggingface_hub import hf_hub_download
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
+# Ensure the models directory exists
+os.makedirs('models', exist_ok=True)
+
 model_path = 'models/sentiment_classification_model.h5'
 
 def download_model():
     if not os.path.exists(model_path):
-        logging.info("Downloading model...")
+        logging.info("Downloading model from Hugging Face Hub...")
         try:
-            # Use the file ID directly
-            file_id = '1_QJB_SKak4wzFup7Z67YprmwBeTMPPUS'
-            gdown.download(id=file_id, output=model_path, quiet=False)
+            hf_hub_download(
+                repo_id="your-username/sentiment-classification-model",
+                filename="sentiment_classification_model.h5",
+                cache_dir="models/",
+            )
             logging.info("Model downloaded successfully.")
         except Exception as e:
             logging.error(f"Error downloading the model: {e}")
-            exit(1)  # Exit if download fails
+            exit(1)
     else:
         logging.info("Model already exists.")
 
@@ -46,16 +51,14 @@ download_model()
 
 # Load the model and tokenizer
 try:
+    # Custom object needed for loading the model
     model = load_model(model_path, custom_objects={'TFBertModel': TFBertModel})
     logging.info("Model loaded successfully.")
 except Exception as e:
     logging.error(f"Error loading the model: {e}")
     exit(1)
 
-# Option A: Load tokenizer from local files
-# tokenizer = BertTokenizer.from_pretrained('models/tokenizer/')
-
-# Option B: Load pretrained tokenizer
+# Load the tokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Ensure NLTK data is downloaded
