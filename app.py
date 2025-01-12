@@ -30,7 +30,7 @@ def download_model():
     logging.info("Downloading model from Hugging Face Hub...")
     try:
         model_file = hf_hub_download(
-            repo_id="your-username/sentiment-classification-model",
+            repo_id="aryandadwal/sentiment-classification-model",
             filename="sentiment_classification_model.h5",
             cache_dir="models",
             force_download=True
