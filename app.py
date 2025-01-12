@@ -1,8 +1,6 @@
-# app.py
-
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow INFO and WARNING messages
-from tensorflow import keras
+
 from flask import Flask, request, jsonify
 from tensorflow.keras.models import load_model
 from transformers import BertTokenizer, TFBertModel
@@ -19,7 +17,7 @@ from PIL import Image
 import io
 import logging
 from huggingface_hub import hf_hub_download
-from tensorflow.keras.layers import Input
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -28,31 +26,27 @@ app = Flask(__name__)
 # Ensure the models directory exists
 os.makedirs('models', exist_ok=True)
 
-model_path = 'models/sentiment_classification_model.h5'
-
 def download_model():
-    if not os.path.exists(model_path):
-        logging.info("Downloading model from Hugging Face Hub...")
-        try:
-            hf_hub_download(
-                repo_id="aryandadwal/sentiment-classification-model",
-                filename="sentiment_classification_model.h5",
-                cache_dir="models/",
-            )
-            logging.info("Model downloaded successfully.")
-        except Exception as e:
-            logging.error(f"Error downloading the model: {e}")
-            exit(1)
-    else:
-        logging.info("Model already exists.")
+    logging.info("Downloading model from Hugging Face Hub...")
+    try:
+        model_file = hf_hub_download(
+            repo_id="your-username/sentiment-classification-model",
+            filename="sentiment_classification_model.h5",
+            cache_dir="models",
+            force_download=True
+        )
+        logging.info(f"Model downloaded successfully and saved to {model_file}.")
+        return model_file
+    except Exception as e:
+        logging.error(f"Error downloading the model: {e}")
+        exit(1)
 
-# Call the function to download the model
-download_model()
+# Download the model and get the path to the saved file
+model_file = download_model()
 
 # Load the model and tokenizer
 try:
-    # Custom object needed for loading the model
-    model = load_model(model_path, custom_objects={'TFBertModel': TFBertModel})
+    model = load_model(model_file, custom_objects={'TFBertModel': TFBertModel})
     logging.info("Model loaded successfully.")
 except Exception as e:
     logging.error(f"Error loading the model: {e}")
@@ -78,7 +72,6 @@ sentiment_mapping = {
     3: 'negative',
     4: 'very_negative'
 }
-
 # Define the text preprocessing function
 def preprocess_text(text):
     if not isinstance(text, str):
