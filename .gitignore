@@ -1,0 +1,12 @@
+# Ignore model files
+models/sentiment_classification_model.h5
+models/*.h5
+
+# Ignore data directory (if large)
+data/
+data/*
+
+# Ignore any other large files
+*.h5
+*.pkl
+*.pickle
