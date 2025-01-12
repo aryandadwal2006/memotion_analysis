@@ -2,7 +2,7 @@
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow INFO and WARNING messages
-
+from tensorflow import keras
 from flask import Flask, request, jsonify
 from tensorflow.keras.models import load_model
 from transformers import BertTokenizer, TFBertModel
@@ -19,7 +19,7 @@ from PIL import Image
 import io
 import logging
 from huggingface_hub import hf_hub_download
-
+from tensorflow.keras.layers import Input
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
